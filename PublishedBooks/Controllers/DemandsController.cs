@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace PublishedBooks.Controllers
 {
+    [Authorize]
     public class DemandsController : Controller
     {
         IRepository<User> usersRepository;

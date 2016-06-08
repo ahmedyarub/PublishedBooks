@@ -8,6 +8,7 @@ using PublishedBooks.Models;
 using PublishedBooksDAL.Entities;
 using PublishedBooksDAL.Repositories;
 using PublishedBooks.Security;
+using PublishedBooks.Infrastructure.Security;
 
 namespace PublishedBooks.Controllers
 {
@@ -15,10 +16,12 @@ namespace PublishedBooks.Controllers
     public class AccountController : Controller
     {
         IRepository<User> usersRepository;
+        IAuthProvider authprovider;
 
-        public AccountController(IRepository<User> users)
+        public AccountController(IRepository<User> users, IAuthProvider auth)
         {
             usersRepository = users;
+            authprovider = auth;
         }
 
         //
@@ -38,16 +41,15 @@ namespace PublishedBooks.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = usersRepository.SearchFor(u => u.Username == model.Username && u.Password == model.Password).FirstOrDefault();
-                if (user != null)
+                if (authprovider.Authenticate(model.Username, model.Password))
                 {
                     CustomPrincipalSerializeModel serializeModel = new CustomPrincipalSerializeModel();
-                    serializeModel.Username = user.Username;
+                    serializeModel.Username = model.Username;
 
                     string userData = JsonConvert.SerializeObject(serializeModel);
                     FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(
                              1,
-                            user.Username,
+                            model.Username,
                              DateTime.Now,
                              DateTime.Now.AddMinutes(15),
                              false,
@@ -55,9 +57,10 @@ namespace PublishedBooks.Controllers
 
                     string encTicket = FormsAuthentication.Encrypt(authTicket);
                     HttpCookie faCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encTicket);
-                    Response.Cookies.Add(faCookie);
+                    if(Response!=null)
+                        Response.Cookies.Add(faCookie);
 
-                    return RedirectToAction("Index", "Home");
+                    return Redirect(returnUrl ?? Url.Action("Index", "Home"));
                 }
 
                 ModelState.AddModelError("", "Incorrect username and/or password");

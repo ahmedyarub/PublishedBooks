@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web.Mvc;
 using Ninject;
 using PublishedBooksDAL.Repositories;
+using PublishedBooks.Infrastructure.Security;
 
 namespace PublishedBooks.Infrastructure {
 
@@ -25,6 +26,7 @@ namespace PublishedBooks.Infrastructure {
         private void AddBindings() {    
             kernel.Bind(typeof(IRepository<>)).To(typeof(MongoDbRepository<>)).WhenInjectedInto(typeof(LogRepository<>));
             kernel.Bind(typeof(IRepository<>)).To(typeof(LogRepository<>));
+            kernel.Bind<IAuthProvider>().To<MongoAuthProvider>();
         }
     }
 }
