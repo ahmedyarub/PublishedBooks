@@ -62,6 +62,7 @@
     <Compile Include="Entities\User.cs" />
     <Compile Include="Repositories\BaseRepo.cs" />
     <Compile Include="Repositories\IRepository.cs" />
+    <Compile Include="Repositories\LogRepository.cs" />
     <Compile Include="Repositories\MongoDbRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

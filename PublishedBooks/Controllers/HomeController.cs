@@ -10,6 +10,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using PagedList;
+using PublishedBooks.Infrastructure;
 
 namespace PublishedBooks.Controllers
 {
@@ -18,42 +19,30 @@ namespace PublishedBooks.Controllers
     {
         public ActionResult Index(string booktitle, string description, string publisher, string author, int page = 1)
         {
-            ViewBag.Title = "Published Book";
-            var client = new HttpClient();
+            var proxy = new BooksProxy();
 
-            var builder = new UriBuilder("http://localhost:34717/api/Book");
-            NameValueCollection query = HttpUtility.ParseQueryString(builder.Query);
+            ViewBag.Title = "Published Book";
 
             if (!string.IsNullOrEmpty(booktitle))
             {
-                query["title"] = booktitle;
                 ViewBag.BookTitle = booktitle;
             }
             if (!string.IsNullOrEmpty(publisher))
             {
-                query["publisher"] = publisher;
                 ViewBag.Publisher = publisher;
             }
             if (!string.IsNullOrEmpty(description))
             {
-                query["description"] = description;
                 ViewBag.Description = description;
             }
             if (!string.IsNullOrEmpty(author))
             {
-                query["author"] = author;
                 ViewBag.Author = author;
             }
 
-            builder.Query = query.ToString();
+            var items = proxy.GetFiltered(booktitle, description, publisher, author);
 
-            var response = client.GetAsync(builder.ToString());
-            if (response.Result.IsSuccessStatusCode)
-            {
-                var items = JsonConvert.DeserializeObject<List<Book>>(response.Result.Content.ReadAsStringAsync().Result);
-                return View(new PagedList<Book>(items, page, 5));
-            }
-            return View();
+            return View(new PagedList<Book>(items, page, 5));
         }
     }
 }

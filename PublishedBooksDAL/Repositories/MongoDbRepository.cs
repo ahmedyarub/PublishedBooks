@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Linq.Expressions;
-
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Driver.Linq;
@@ -46,27 +45,13 @@ namespace PublishedBooksDAL.Repositories
                     .DocumentsAffected > 0;
         }
 
-        public bool Delete(TEntity entity)
-        {
-            return collection.Value
-                .Remove(Query.EQ("_id", entity.Id))
-                    .DocumentsAffected > 0;
-        }
+        public bool Delete(TEntity entity) => collection.Value.Remove(Query.EQ("_id", entity.Id)).DocumentsAffected > 0;
 
-        public IList<TEntity> SearchFor(Expression<Func<TEntity, bool>> predicate)
-        {
-            return collection.Value.AsQueryable<TEntity>().Where(predicate.Compile()).ToList();
-        }
+        public IList<TEntity> SearchFor(Expression<Func<TEntity, bool>> predicate) => collection.Value.AsQueryable<TEntity>().Where(predicate.Compile()).ToList();
 
-        public IList<TEntity> GetAll()
-        {
-            return collection.Value.FindAllAs<TEntity>().ToList();
-        }
+        public IList<TEntity> GetAll() => collection.Value.FindAllAs<TEntity>().ToList();
 
-        public TEntity GetById(Guid id)
-        {
-            return collection.Value.FindOneByIdAs<TEntity>(id);
-        }
+        public TEntity GetById(Guid id) => collection.Value.FindOneByIdAs<TEntity>(id);
 
         protected override void Dispose(bool disposing)
         {
@@ -87,25 +72,11 @@ namespace PublishedBooksDAL.Repositories
             return server.GetDatabase(GetDatabaseName());
         }
 
-        private string GetConnectionString()
-        {
-            return ConfigurationManager
-                .AppSettings
-                    .Get("MongoDbConnectionString")
-                        .Replace("{DB_NAME}", GetDatabaseName());
-        }
+        private string GetConnectionString() => ConfigurationManager.AppSettings.Get("MongoDbConnectionString").Replace("{DB_NAME}", GetDatabaseName());
 
-        private string GetDatabaseName()
-        {
-            return ConfigurationManager
-                .AppSettings
-                    .Get("MongoDbDatabaseName");
-        }
+        private string GetDatabaseName() => ConfigurationManager.AppSettings.Get("MongoDbDatabaseName");
 
-        private MongoCollection<TEntity> GetCollection()
-        {
-            return database.Value.GetCollection<TEntity>(typeof(TEntity).Name);
-        }
+        private MongoCollection<TEntity> GetCollection() => database.Value.GetCollection<TEntity>(typeof(TEntity).Name);
         #endregion
     }
 }

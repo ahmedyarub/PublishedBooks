@@ -14,7 +14,12 @@ namespace PublishedBooks.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        MongoDbRepository<User> usersRepository = new MongoDbRepository<User>();
+        IRepository<User> usersRepository;
+
+        public AccountController(IRepository<User> users)
+        {
+            usersRepository = users;
+        }
 
         //
         // GET: /Account/Login

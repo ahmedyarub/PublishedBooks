@@ -10,7 +10,12 @@ namespace PublishedBooks.Controllers
 {
     public class DemandsController : Controller
     {
-        MongoDbRepository<User> usersRepository = new MongoDbRepository<User>();
+        IRepository<User> usersRepository;
+
+        public DemandsController(IRepository<User> users)
+        {
+            usersRepository = users;
+        }
 
         public ActionResult Index()
         {
